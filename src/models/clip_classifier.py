@@ -18,7 +18,6 @@ class ClipClassifier(BaseModel):
         return [class_template.format(class_name) for class_name in class_names]
 
     def predict(self, x: DataLoader) -> torch.Tensor:
-
         predictions = []
         for image_paths in x:
             images = [Image.open(image_path) for image_path in image_paths]
