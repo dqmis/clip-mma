@@ -21,3 +21,11 @@ poetry install
 ```bash
 poetry run pre-commit install
 ```
+
+## Datasets
+
+For some of the datasets, you have to download them from the original source. The datasets are not included in this repository.
+
+### Stanford Cars
+
+Download the dataset from https://www.kaggle.com/datasets/jutrera/stanford-car-dataset-by-classes-folder to `data/stanford-cars`.
