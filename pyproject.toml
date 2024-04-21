@@ -9,8 +9,15 @@ readme = "README.md"
 python = ">=3.11,<3.12.dev0"
 torch = "^2.2.2"
 numpy = "^1.26.4"
-transformers = "^4.39.3"
+transformers = "4.38.2"
 pillow = "^10.3.0"
+torchvision = "^0.17.2"
+scikit-learn = "^1.4.2"
+datasets = "^2.19.0"
+evaluate = "^0.4.1"
+seqeval = "^1.2.2"
+scipy = "^1.13.0"
+matplotlib = "^3.8.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -21,6 +28,8 @@ pre-commit = "^3.7.0"
 flake8-pyproject = "^1.2.3"
 mypy = "^1.9.0"
 wandb = "^0.16.1"
+ipykernel = "^6.29.4"
+pandas-stubs = "^2.2.1.240316"
 
 [build-system]
 requires = ["poetry-core"]
@@ -58,9 +67,9 @@ profile = "black"
 skip = ["conftest.py", ".git", "__pycache__", ".venv"]
 
 [tool.mypy]
-files = "src/**/*.py"
+files = "fomo/**/*.py"
 warn_unused_configs = true
-disallow_any_generics = true
+disallow_any_generics = false
 disallow_subclassing_any = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
@@ -74,6 +83,18 @@ warn_redundant_casts = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
+module = [
+  "torchvision.*",
+  "transformers.*",
+  "torch.*",
+  "numpy.*",
+  "PIL.*",
+  "wandb.*",
+  "sklearn.*",
+  "datasets.*",
+  "evaluate.*",
+  "tqdm.*",
+  "scipy.*",
+]
 # Put dependencie's name here if mypy fails to import stubs
-module = ["scipy.*"]
 ignore_missing_imports = true
