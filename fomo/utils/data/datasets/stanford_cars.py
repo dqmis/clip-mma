@@ -1,19 +1,21 @@
 import csv
 import glob
 from pathlib import Path
+from typing import Callable
 
 import torch
 from PIL import Image
 
 
 class StanfordCars(torch.utils.data.Dataset):
-    def __init__(self, root_path: str, train: bool = True) -> None:
+    def __init__(self, root_path: str, train: bool = True, transforms: Callable | None = None) -> None:
         subdirs_path = Path("car_data/car_data/")
         subpath = subdirs_path / "train" if train else subdirs_path / "test"
 
         self.root_path = Path(root_path) / "stanford-cars"
         self.split_path = Path(root_path) / subpath
         self.is_train_split = train
+        self.transforms = transforms
 
         self.images = glob.glob(str(self.split_path / "**/*.jpg"), recursive=True)
 
@@ -41,6 +43,8 @@ class StanfordCars(torch.utils.data.Dataset):
         image_file = self.images[index]
         with Image.open(image_file) as img:
             image = img.convert("RGB")
+            if self.transforms:
+                image = self.transforms(image)
         label = self.label_map[Path(image_file).name]
 
         return image, label

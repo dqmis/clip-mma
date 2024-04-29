@@ -46,19 +46,21 @@ class EvaluatePipeline:
         results = {}
 
         for dataset_loader in self._dataset_initializers:
-            zero_shot_dataset, dataset_name = dataset_loader.value(train=False), dataset_loader.name
+            zero_shot_dataset, dataset_name = (
+                dataset_loader.value(train=False, transforms=model.transforms),
+                dataset_loader.name,
+            )
             dataset, labels = zero_shot_dataset.dataset, zero_shot_dataset.labels
 
-            def collate_fn(batch: list[tuple[Any, Any]]) -> list[tuple[Any, ...]]:
-                return list(zip(*batch))
-
             dataloader: DataLoader[Any] = DataLoader(
-                dataset, batch_size=model.batch_size, shuffle=False, collate_fn=collate_fn
+                dataset,
+                batch_size=model.batch_size,
+                shuffle=False,
             )
 
             model.reconfig_labels(labels)
 
-            logger.info(f"Evaluating model on dataset {dataset}")
+            logger.info(f"Evaluating model on dataset {dataset.__class__.__name__}")
             y_true, y_pred = self._model.predict_for_eval(dataloader)
 
             for metric in self._metrics:
@@ -75,7 +77,9 @@ if __name__ == "__main__":
     model = Model.from_str(args.model)
     dataset_initializers = [DatasetInitializer.from_str(dataset) for dataset in args.datasets]
 
-    pipeline = EvaluatePipeline(model=model, dataset_initializers=dataset_initializers, metrics=METRICS)
+    pipeline = EvaluatePipeline(
+        model=model, dataset_initializers=dataset_initializers, metrics=METRICS  # type: ignore
+    )
 
     wandb.init(
         project="fomo",

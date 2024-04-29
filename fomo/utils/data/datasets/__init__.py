@@ -1,5 +1,5 @@
 import enum
-from typing import Self
+from typing import Callable, Self
 
 from torchvision import datasets
 
@@ -8,8 +8,8 @@ from fomo.utils.data.zero_shot_dataset import ZeroShotDataset
 
 
 class CIFAR10(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data") -> None:
-        dataset = datasets.CIFAR10(root=root, train=train, download=True)
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = datasets.CIFAR10(root=root, train=train, download=True, transform=transforms)
 
         super().__init__(dataset=dataset)
 
@@ -19,8 +19,10 @@ class CIFAR10(ZeroShotDataset):
 
 
 class OxfordFlowers(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data") -> None:
-        dataset = datasets.Flowers102(root=root, split="train" if train else "test", download=True)
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = datasets.Flowers102(
+            root=root, split="train" if train else "test", download=True, transform=transforms
+        )
 
         super().__init__(dataset=dataset)
 
@@ -30,8 +32,10 @@ class OxfordFlowers(ZeroShotDataset):
 
 
 class OxfordPets(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data") -> None:
-        dataset = datasets.OxfordIIITPet(root=root, split="trainval" if train else "test", download=True)
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = datasets.OxfordIIITPet(
+            root=root, split="trainval" if train else "test", download=True, transform=transforms
+        )
 
         super().__init__(dataset=dataset)
 
@@ -41,8 +45,10 @@ class OxfordPets(ZeroShotDataset):
 
 
 class Food101(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data") -> None:
-        dataset = datasets.Food101(root=root, download=True, split="train" if train else "test")
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = datasets.Food101(
+            root=root, download=True, split="train" if train else "test", transform=transforms
+        )
 
         super().__init__(dataset=dataset)
 
@@ -52,8 +58,8 @@ class Food101(ZeroShotDataset):
 
 
 class StanfordCars(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data") -> None:
-        dataset = stanford_cars.StanfordCars(root_path=root, train=train)
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = stanford_cars.StanfordCars(root_path=root, train=train, transforms=transforms)
 
         super().__init__(dataset=dataset)
 
