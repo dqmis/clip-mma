@@ -47,18 +47,18 @@ class EvaluatePipeline:
 
         for dataset_loader in self._dataset_initializers:
             zero_shot_dataset, dataset_name = (
-                dataset_loader.value(train=False, transforms=model.transforms),
+                dataset_loader.value(train=False, transforms=self._model.transforms),
                 dataset_loader.name,
             )
             dataset, labels = zero_shot_dataset.dataset, zero_shot_dataset.labels
 
             dataloader: DataLoader[Any] = DataLoader(
                 dataset,
-                batch_size=model.batch_size,
+                batch_size=self._model.batch_size,
                 shuffle=False,
             )
 
-            model.reconfig_labels(labels)
+            self._model.reconfig_labels(labels)
 
             logger.info(f"Evaluating model on dataset {dataset.__class__.__name__}")
             y_true, y_pred = self._model.predict_for_eval(dataloader)
