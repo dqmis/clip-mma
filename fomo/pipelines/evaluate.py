@@ -36,11 +36,16 @@ def parse_args() -> argparse.Namespace:
 
 class EvaluatePipeline:
     def __init__(
-        self, model: BaseModel, dataset_initializers: list[DatasetInitializer], metrics: list[Metric]
+        self,
+        model: BaseModel,
+        dataset_initializers: list[DatasetInitializer],
+        metrics: list[Metric],
+        batch_size: int = 1,
     ) -> None:
         self._model = model
         self._dataset_initializers = dataset_initializers
         self._metrics = metrics
+        self._batch_size = batch_size
 
     def run(self) -> dict[str, dict[str, Any]]:
         results = {}
@@ -54,11 +59,11 @@ class EvaluatePipeline:
 
             dataloader: DataLoader[Any] = DataLoader(
                 dataset,
-                batch_size=self._model.batch_size,
+                batch_size=self._batch_size,
                 shuffle=False,
             )
 
-            self._model.reconfig_labels(labels)
+            self._model.reconfig_labels(labels=labels)
 
             logger.info(f"Evaluating model on dataset {dataset.__class__.__name__}")
             y_true, y_pred = self._model.predict_for_eval(dataloader)

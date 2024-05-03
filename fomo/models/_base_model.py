@@ -35,3 +35,15 @@ class BaseModel(ABC):
         """Reconfigures the model for a given dataset."""
 
         pass
+
+    @abstractmethod
+    def precompute_image_embeddings(self, x: DataLoader[Any]) -> NDArray[Any]:
+        """Precomputes image embeddings for a given dataset."""
+
+        pass
+
+    @abstractmethod
+    def precompute_prompt_embeddings(self) -> NDArray[Any]:
+        """Precomputes prompt embeddings for a given dataset."""
+
+        pass

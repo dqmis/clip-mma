@@ -49,3 +49,20 @@ class ClipClassifier(BaseModel):
             predictions.extend(probs.argmax(dim=1).cpu().numpy())
             targets.extend(batch_targets)
         return np.array(targets), np.array(predictions)
+
+    def precompute_image_embeddings(self, x: DataLoader[Any]) -> tuple[NDArray[Any], NDArray[Any]]:
+        image_embeddings = []
+        targets = []
+        for batch in tqdm(x):
+            images, labels = batch
+
+            with torch.no_grad():
+                image_embeddings.extend(self._model.encode_images(images).numpy())
+                labels.extend(targets)
+
+        return np.array(image_embeddings), np.array(targets)
+
+    def precompute_prompt_embeddings(self) -> None:
+        prompts = self._build_class_prompt(self._class_propmts)
+
+        return self._model.encode_text(prompts).numpy()
