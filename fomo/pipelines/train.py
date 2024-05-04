@@ -272,13 +272,3 @@ class Learner:
             wandb.log({f"{split}_acc": top1_prompt.avg})
 
         return top1_prompt.avg
-
-
-if __name__ == "__main__":
-    learner_args = LearnerArgs()
-    learner_args.device = "cpu"
-    learner_args.epochs = 2
-    learner_args.model_type = "clip_linear"
-    learner_args.train_eval_size = (10, 10)
-    learner = Learner(learner_args)
-    learner.run()
