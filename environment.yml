@@ -1,0 +1,4 @@
+name: fomo
+dependencies:
+  - python=3.11.5
+  - pip=23.3.1

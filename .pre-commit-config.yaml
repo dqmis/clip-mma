@@ -30,3 +30,9 @@ repos:
         entry: poetry run mypy
         language: system
         types: [python]
+      - id: export-requirements
+        name: Export requeriments.txt
+        language: system
+        pass_filenames: false
+        entry: poetry export --without-hashes -o requirements.txt
+        files: ^(pyproject.toml|poetry.lock)$
