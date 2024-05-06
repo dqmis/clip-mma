@@ -30,3 +30,8 @@ repos:
         entry: poetry run mypy
         language: system
         types: [python]
+      - id: requirements-export
+        name: requirements-export
+        entry: poetry export --without-hashes --format=requirements.txt > requirements.txt
+        language: system
+        types: [python]
