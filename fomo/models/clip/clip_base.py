@@ -1,7 +1,11 @@
-from typing import Self
+from typing_extensions import Self,List, Union
+import sys
+
+sys.path.append('/home/schatterjee/FOMO/fomo/fomo')
+
 
 import torch
-from clip import clip
+from fomo.models.clip import clip
 from PIL.Image import Image
 from torch import nn
 from torchvision.transforms import Compose
@@ -48,7 +52,7 @@ class ClipBase(nn.Module):
     def device(self) -> torch.device:
         return next(self.parameters()).device
 
-    def forward(self, images: torch.Tensor, prompts: list[str] | None = None) -> torch.Tensor:
+    def forward(self, images: torch.Tensor, prompts: Union[list[str], None] = None) -> torch.Tensor:
         if prompts:
             text_features = self.encode_text(prompts)
         elif self._precomputed_prompt_features is not None:

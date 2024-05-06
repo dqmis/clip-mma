@@ -1,5 +1,5 @@
-from typing import Any
-
+from typing_extensions import Any
+from typing_extensions import Self,List, Union
 import numpy as np
 import torch
 from numpy.typing import NDArray
@@ -12,7 +12,7 @@ from fomo.models.clip.clip_base import ClipBase
 
 
 class ClipClassifier(BaseModel):
-    def __init__(self, model_base: str, class_template: str | None = None) -> None:
+    def __init__(self, model_base: str, class_template: Union[list[str], None] = None) -> None:
         self._model = ClipBase(model_base)
         self._model.to_cpu()
         self._model.eval()

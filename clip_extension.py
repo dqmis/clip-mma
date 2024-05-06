@@ -1,21 +1,27 @@
-import torch
-from torch import nn
-from typing_extensions import Self,List, Union
 from fomo.models.clip.clip_base import ClipBase
+from torch import nn
+import torch
+from typing_extensions import Self,List, Union
 
 
-class ClipLinear(ClipBase):
+class ClipExtension(ClipBase):
     def __init__(self, backbone: str = "ViT-B/16", root: str = "./data") -> None:
-        super(ClipLinear, self).__init__(backbone, root=root)
+        # pass default arguments to the parent class
+        super(ClipExtension, self).__init__(backbone, root=root)
 
-        self.image_linear = nn.Sequential(
-            nn.Linear(self._clip.visual.output_dim, self._clip.visual.output_dim)
+        # add additional blocks to the model
+
+        self.visual_mlp = nn.Sequential(
+            nn.Linear(self._clip.visual.output_dim, 12),
+            nn.Linear(12, self._clip.visual.output_dim)
         )
 
     @property
     def learnable_param_names(self) -> set[str]:
+         # IMPORTANT: Add the name of the learnable parameters in the model
         return set(["image_linear"])
 
+    # If needed you can override the to_cpu and to_cuda methods
     def to_cpu(self) -> None:
         self._clip.to(torch.device("cpu"))
         self.image_linear.to(torch.device("cpu"))
@@ -26,6 +32,7 @@ class ClipLinear(ClipBase):
         self._clip.to(torch.device("cuda"))
 
     def forward(self, images: torch.Tensor, prompts: Union[list[str], None] = None) -> torch.Tensor:
+        # Change the forward method to include the visual_mlp
         if prompts:
             text_features = self.encode_text(prompts)
         elif self._precomputed_prompt_features is not None:
@@ -40,3 +47,9 @@ class ClipLinear(ClipBase):
         logits_per_image: torch.Tensor = self.logit_scale * image_features @ text_features.t()
 
         return logits_per_image
+
+if __name__ == "__main__":
+    model = ClipExtension()
+
+    #print learnable parameters
+    print(model.learnable_param_names)
