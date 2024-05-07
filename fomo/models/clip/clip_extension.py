@@ -2,6 +2,7 @@ from fomo.models.clip.clip_base import ClipBase
 from torch import nn
 import torch
 from typing_extensions import Self,List, Union
+import time
 
 def init_weights(m):
             if isinstance(m, nn.Linear):
@@ -20,9 +21,8 @@ class ClipExtension(ClipBase):
         self.text_linear = nn.Linear(10,10)
         
         
-        self.image_linear.apply(init_weights)
-        self.text_linear.apply(init_weights)
-        self.to_cuda()
+        # self.image_linear.apply(init_weights)
+        # self.text_linear.apply(init_weights)
         
         
 
@@ -40,17 +40,23 @@ class ClipExtension(ClipBase):
 
     # If needed you can override the to_cpu and to_cuda methods
     def to_cpu(self) -> None:
+        self._clip.to(torch.device("cpu"))
         self.image_linear.to(torch.device("cpu"))
         self.text_linear.to(torch.device("cpu"))
+        self._clip.float()
         
     def to_cuda(self) -> None:
         self.image_linear.to(torch.device("cuda"))
         self.text_linear.to(torch.device("cuda"))
+        self._clip.to(torch.device("cuda"))
+
         
         
 
     def forward(self, images: torch.Tensor, prompts: Union[list[str], None] = None) -> torch.Tensor:
         
+        start = time.process_time()
+        print("Start Time:",start)
         # Change the forward method to include the visual_mlp
         if prompts:
             text_features = self.encode_text(prompts)
@@ -62,22 +68,19 @@ class ClipExtension(ClipBase):
         image_features = self.encode_images(images)
         image_features = image_features.to(torch.float32)
         text_features = text_features.to(torch.float32)
-        image_features = image_features.to(torch.device("cuda"))
-        text_features = text_features.to(torch.device("cuda"))
         
 
 
         
         output1 = self.image_linear(image_features)
         output2 = image_features @ text_features.t()
-        #output2 = output2.to(torch.float32)
         output3 = output1 + output2
-        output4 = self.text_linear(output3)
-        #print("Leanred parmas:",self.learnable_param_names)
-        print("MLP output shape:",output4.shape)
+        output3 = self.text_linear(output2)
+        print("MLP output shape:",output3.shape)
         
-
+        end = time.process_time()
+        print("Time taken for forward of clip extension:",end-start)
         #logits_per_image: torch.Tensor = self.logit_scale * image_features @ text_features.t()
         #print("Logits shape:",logits_per_image.shape)
 
-        return output4
+        return output3

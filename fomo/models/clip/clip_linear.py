@@ -34,7 +34,8 @@ class ClipLinear(ClipBase):
             raise ValueError("At least one prompts or pre-computed promt features has to be present.")
 
         image_features = self.encode_images(images)
-
+        image_features = image_features.to(torch.float32)
+        text_features = text_features.to(torch.float32)
         image_features = self.image_linear(image_features)
 
         logits_per_image: torch.Tensor = self.logit_scale * image_features @ text_features.t()
