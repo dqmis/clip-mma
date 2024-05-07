@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import Any, Callable, List, Tuple
+from typing_extensions import Any, Callable, List, Tuple
 
 import numpy as np
 import torch

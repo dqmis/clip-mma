@@ -1,4 +1,4 @@
-from typing import Any
+from typing_extensions import Any, Union
 
 import torch
 from sklearn.model_selection import train_test_split
@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, Subset
 
 
 def split_train_val(
-    dataset: Dataset, train_size: float | None = None, train_eval_samples: tuple[int, int] | None = None
+    dataset: Dataset, train_size: Union[float , None] = None, train_eval_samples: Union[tuple[int, int] , None] = None
 ) -> list[Subset[Any]]:
     """
     If train_size is provided, it will split the dataset into train and validation sets based on

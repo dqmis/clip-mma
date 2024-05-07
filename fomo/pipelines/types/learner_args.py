@@ -3,6 +3,7 @@ import os
 import time
 from dataclasses import dataclass
 from typing import Any
+from typing_extensions import Self,List, Union
 
 
 @dataclass
@@ -19,8 +20,8 @@ class LearnerArgs:
     device: str = "cuda"
     batch_size: int = 64
     num_workers: int = 4
-    train_size: float | None = None
-    train_eval_size: tuple[int, int] | None = None
+    train_size: Union[float, None] = None
+    train_eval_size:  Union[tuple[int, int], None] = None
     text_prompt_template: str = "a photo of {}."
     learning_rate: float = 0.01
     momentum: float = 0.9

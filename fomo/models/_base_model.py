@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing_extensions import Any
 
 from numpy.typing import NDArray
 from torch.utils.data import DataLoader

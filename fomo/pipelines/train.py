@@ -108,13 +108,14 @@ class Learner:
 
     def _configure_trainable_params(self) -> None:
         print("Turning off gradients in both the image and the text encoder")
+        print(self.model.learnable_param_names)
+        for name, param in self.model.named_parameters():
+            param.requires_grad = False
         for name, param in self.model.named_parameters():
             for learnable_param_name in self.model.learnable_param_names:
-                if learnable_param_name not in name:
-                    param.requires_grad = False
-                else:
+                if learnable_param_name  in name:
                     param.requires_grad = True
-
+                
         # Double check
         enabled = set()
         for name, param in self.model.named_parameters():
@@ -197,6 +198,7 @@ class Learner:
             images = images.to(self.model.device)
             targets = targets.to(self.model.device)
             outputs = self.model(images)
+            outputs = outputs.to(self.model.device)
 
             loss = self.criterion(outputs, targets)
 

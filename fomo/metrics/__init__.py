@@ -1,4 +1,4 @@
-from typing import Any
+from typing_extensions import Any
 
 from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score, precision_score, recall_score

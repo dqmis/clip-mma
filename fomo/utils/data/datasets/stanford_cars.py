@@ -1,14 +1,14 @@
 import csv
 import glob
 from pathlib import Path
-from typing import Callable
+from typing_extensions import Callable,Union
 
 import torch
 from PIL import Image
 
 
 class StanfordCars(torch.utils.data.Dataset):
-    def __init__(self, root_path: str, train: bool = True, transforms: Callable | None = None) -> None:
+    def __init__(self, root_path: str, train: bool = True, transforms: Union[Callable, None] = None) -> None:
         subdirs_path = Path("car_data/car_data/")
         subpath = subdirs_path / "train" if train else subdirs_path / "test"
 

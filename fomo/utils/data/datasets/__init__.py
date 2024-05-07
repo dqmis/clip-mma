@@ -1,5 +1,5 @@
 import enum
-from typing import Callable, Self
+from typing_extensions import Callable, Self,Union
 
 from torchvision import datasets
 
@@ -8,7 +8,7 @@ from fomo.utils.data.zero_shot_dataset import ZeroShotDataset
 
 
 class CIFAR10(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+    def __init__(self, train: bool, root: str = "data", transforms: Union[Callable, None] = None) -> None:
         dataset = datasets.CIFAR10(root=root, train=train, download=True, transform=transforms)
 
         super().__init__(dataset=dataset)
@@ -19,7 +19,7 @@ class CIFAR10(ZeroShotDataset):
 
 
 class OxfordFlowers(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+    def __init__(self, train: bool, root: str = "data", transforms: Union[Callable, None] = None) -> None:
         dataset = datasets.Flowers102(
             root=root, split="train" if train else "test", download=True, transform=transforms
         )
@@ -32,7 +32,7 @@ class OxfordFlowers(ZeroShotDataset):
 
 
 class OxfordPets(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+    def __init__(self, train: bool, root: str = "data", transforms: Union[Callable, None] = None) -> None:
         dataset = datasets.OxfordIIITPet(
             root=root, split="trainval" if train else "test", download=True, transform=transforms
         )
@@ -45,7 +45,7 @@ class OxfordPets(ZeroShotDataset):
 
 
 class Food101(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+    def __init__(self, train: bool, root: str = "data", transforms: Union[Callable, None] = None) -> None:
         dataset = datasets.Food101(
             root=root, download=True, split="train" if train else "test", transform=transforms
         )
@@ -58,7 +58,7 @@ class Food101(ZeroShotDataset):
 
 
 class StanfordCars(ZeroShotDataset):
-    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+    def __init__(self, train: bool, root: str = "data", transforms: Union[Callable, None] = None) -> None:
         dataset = stanford_cars.StanfordCars(root_path=root, train=train, transforms=transforms)
 
         super().__init__(dataset=dataset)
