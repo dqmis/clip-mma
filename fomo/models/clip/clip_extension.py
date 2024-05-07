@@ -21,8 +21,8 @@ class ClipExtension(ClipBase):
         self.text_linear = nn.Linear(10,10)
         
         
-        # self.image_linear.apply(init_weights)
-        # self.text_linear.apply(init_weights)
+        self.image_linear.apply(init_weights)
+        self.text_linear.apply(init_weights)
         
         
 
@@ -55,8 +55,8 @@ class ClipExtension(ClipBase):
 
     def forward(self, images: torch.Tensor, prompts: Union[list[str], None] = None) -> torch.Tensor:
         
-        start = time.process_time()
-        print("Start Time:",start)
+        #start = time.process_time()
+        #print("Start Time:",start)
         # Change the forward method to include the visual_mlp
         if prompts:
             text_features = self.encode_text(prompts)
@@ -74,13 +74,14 @@ class ClipExtension(ClipBase):
         
         output1 = self.image_linear(image_features)
         output2 = image_features @ text_features.t()
+         
         output3 = output1 + output2
-        output3 = self.text_linear(output2)
-        print("MLP output shape:",output3.shape)
+        output4 = self.text_linear(output3)
         
-        end = time.process_time()
-        print("Time taken for forward of clip extension:",end-start)
+        
+        #end = time.process_time()
+        #print("Time taken for forward of clip extension:",end-start)
         #logits_per_image: torch.Tensor = self.logit_scale * image_features @ text_features.t()
         #print("Logits shape:",logits_per_image.shape)
 
-        return output3
+        return output4
