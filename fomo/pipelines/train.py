@@ -255,6 +255,7 @@ class Learner:
                 target = target.to(self.model.device)
 
                 output = self.model(images)
+                output = output.to(self.model.device)
                 loss = self.criterion(output, target)
 
                 acc1 = accuracy(output, target, topk=(1,))
