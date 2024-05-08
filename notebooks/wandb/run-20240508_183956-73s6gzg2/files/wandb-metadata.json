@@ -1,0 +1,67 @@
+{
+    "os": "Linux-5.10.0-28-cloud-amd64-x86_64-with-glibc2.31",
+    "python": "3.11.6",
+    "heartbeatAt": "2024-05-08T18:39:56.844280",
+    "startedAt": "2024-05-08T18:39:56.249171",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "<python with no main file>",
+    "codePathLocal": null,
+    "git": {
+        "remote": "git@github.com:dqmis/fomo.git",
+        "commit": "fb55ee4961f9af3655f3524cb6e4f4c4089d9270"
+    },
+    "email": null,
+    "root": "/home/jupyter/github/fomo",
+    "host": "instance-20240508-191013",
+    "username": "jupyter",
+    "executable": "/home/jupyter/github/fomo/.venv/bin/python",
+    "cpu_count": 2,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 2000.18,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2000.18,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2000.18,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2000.18,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2000.18,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 98.18611526489258,
+            "used": 31.981521606445312
+        }
+    },
+    "gpu": "Tesla T4",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "Tesla T4",
+            "memory_total": 16106127360
+        }
+    ],
+    "memory": {
+        "total": 14.648666381835938
+    }
+}

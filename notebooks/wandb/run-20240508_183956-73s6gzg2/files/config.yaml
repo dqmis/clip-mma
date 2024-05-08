@@ -1,0 +1,104 @@
+wandb_version: 1
+
+use_wandb:
+  desc: null
+  value: true
+epochs:
+  desc: null
+  value: 10
+patience:
+  desc: null
+  value: 4
+model_type:
+  desc: null
+  value: clip_transformer
+print_freq:
+  desc: null
+  value: 100
+save_freq:
+  desc: null
+  value: 100
+output_dir:
+  desc: null
+  value: ./output/clip_base_vit-b16_1715193589
+model_backbone:
+  desc: null
+  value: ViT-B/16
+dataset:
+  desc: null
+  value: cifar10
+device:
+  desc: null
+  value: cuda
+batch_size:
+  desc: null
+  value: 64
+num_workers:
+  desc: null
+  value: 4
+train_size:
+  desc: null
+  value: 0.8
+train_eval_size:
+  desc: null
+  value: null
+text_prompt_template:
+  desc: null
+  value: a photo of {}.
+learning_rate:
+  desc: null
+  value: 0.01
+momentum:
+  desc: null
+  value: 0.9
+weight_decay:
+  desc: null
+  value: 0.0001
+warmup:
+  desc: null
+  value: 0
+seed:
+  desc: null
+  value: 42
+run_id:
+  desc: null
+  value: clip_base_vit-b16_1715193589
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.6
+    cli_version: 0.16.6
+    framework: huggingface
+    huggingface_version: 4.38.2
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    start_time: 1715193596.0
+    t:
+      1:
+      - 1
+      - 5
+      - 11
+      - 41
+      - 49
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 11
+      - 41
+      - 49
+      - 53
+      - 55
+      3:
+      - 2
+      - 13
+      - 16
+      - 23
+      4: 3.11.6
+      5: 0.16.6
+      6: 4.38.2
+      8:
+      - 1
+      - 5
+      13: linux-x86_64
