@@ -8,8 +8,12 @@ class MaskedMultiheadAttention(nn.Module):
 
         self._num_heads = num_heads
 
-        self.mha = nn.MultiheadAttention(embed_dim=512, num_heads=self._num_heads)
+        self.mha = nn.MultiheadAttention(embed_dim=512, num_heads=self._num_heads, dropout=0.3)
         self._attn_mask: torch.Tensor = self._init_attn_mask(1, 1)
+        
+    @property
+    def device(self) -> torch.device:
+        return next(self.parameters()).device
 
     @staticmethod
     def _init_attn_mask(num_prompts: int, num_images: int) -> torch.Tensor:
@@ -32,7 +36,7 @@ class MaskedMultiheadAttention(nn.Module):
         if self._attn_mask.shape[0] != seq_len:
             self._attn_mask = self._init_attn_mask(seq_len - 1, 1)
 
-        mask = self._attn_mask.clone().unsqueeze(0).repeat(batch_size * self._num_heads, 1, 1)
+        mask = self._attn_mask.clone().unsqueeze(0).repeat(batch_size * self._num_heads, 1, 1).to(self.device)
 
         output, _ = self.mha.forward(inputs, inputs, inputs, attn_mask=mask)
         return output

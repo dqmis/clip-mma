@@ -1,1 +1,0 @@
-{"valid_acc": 89.18, "_timestamp": 1715194682.1316547, "_runtime": 1085.873953819275, "_step": 12, "train_loss": 2.2253953868865968, "train_acc": 88.675, "val_acc": 89.18, "test_acc": 90.2, "_wandb": {"runtime": 1109}}

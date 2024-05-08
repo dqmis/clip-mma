@@ -37,8 +37,8 @@ class ClipTransformer(ClipBase):
         else:
             raise ValueError("At least one prompts or pre-computed prompt features has to be present.")
 
-        image_features = self.encode_images(images).unsqueeze(0)
-        text_features = text_features.unsqueeze(1).expand(-1, image_features.shape[1], -1)
+        image_features = self.encode_images(images).to(torch.float32).unsqueeze(0)
+        text_features = text_features.to(torch.float32).unsqueeze(1).expand(-1, image_features.shape[1], -1)
 
         num_classes = text_features.shape[0]
 
