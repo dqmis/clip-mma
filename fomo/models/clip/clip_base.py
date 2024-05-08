@@ -63,8 +63,9 @@ class ClipBase(nn.Module):
         return logits_per_image
 
     def encode_images(self, images: torch.Tensor) -> torch.Tensor:
-        image_features: torch.Tensor = self._clip.encode_image(images.to(self.device))
-        image_features /= image_features.norm(dim=1, keepdim=True)
+        with torch.no_grad():
+            image_features: torch.Tensor = self._clip.encode_image(images.to(self.device))
+            image_features /= image_features.norm(dim=1, keepdim=True)
 
         return image_features
 
