@@ -59,15 +59,6 @@ class Learner:
         self._lr_args = learner_args
 
         set_seed(self._lr_args.seed)
-
-        if self._lr_args.use_wandb:
-            wandb.init(
-                project="fomo",
-                name=self._lr_args.run_id,
-                config=self._lr_args.to_dict(),
-                reinit=True,
-            )
-
         self.best_acc1 = 0.0
 
         # Load clip image transformation
@@ -109,10 +100,9 @@ class Learner:
     def _configure_trainable_params(self) -> None:
         print("Turning off gradients in both the image and the text encoder")
         for name, param in self.model.named_parameters():
+            param.requires_grad = False
             for learnable_param_name in self.model.learnable_param_names:
-                if learnable_param_name not in name:
-                    param.requires_grad = False
-                else:
+                if learnable_param_name in name:
                     param.requires_grad = True
 
         # Double check
@@ -129,6 +119,14 @@ class Learner:
 
     def run(self) -> None:
         """Runs training for the specified number of epochs."""
+        
+        if self._lr_args.use_wandb:
+            wandb.init(
+                project="fomo",
+                name=self._lr_args.run_id,
+                config=self._lr_args.to_dict(),
+                reinit=True,
+            )
 
         epochs_since_improvement = 0
 
@@ -196,7 +194,7 @@ class Learner:
             self.optimizer.zero_grad()
             images = images.to(self.model.device)
             targets = targets.to(self.model.device)
-            outputs = self.model(images)
+            outputs = self.model(images).squeeze(-1)
 
             loss = self.criterion(outputs, targets)
 
@@ -254,6 +252,7 @@ class Learner:
 
                 output = self.model(images)
                 loss = self.criterion(output, target)
+                
 
                 acc1 = accuracy(output, target, topk=(1,))
                 losses.update(loss.item(), images.size(0))

@@ -167,3 +167,4 @@ runtime_data/
 !data/.gitkeep
 /wandb
 notebooks/data/*
+notebooks/wandb/*
