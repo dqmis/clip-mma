@@ -1,4 +1,6 @@
 # import ClipBase
+from typing import Self
+
 import torch
 
 from fomo.models.clip.clip_base import ClipBase
@@ -18,6 +20,16 @@ class ClipTransformer(ClipBase):
     def learnable_param_names(self) -> set[str]:
         # IMPORTANT: Add the name of the learnable parameters in the model
         return set(["mmha"])
+
+    def eval(self) -> Self:
+        self._clip.eval()
+        self.mmha.eval()
+        return self
+
+    def train_(self) -> Self:
+        self._clip.train()
+        self.mmha.train()
+        return self
 
     # If needed you can override the to_cpu and to_cuda methods
     def to_cpu(self) -> None:
