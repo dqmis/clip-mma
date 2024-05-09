@@ -13,7 +13,7 @@ class StanfordCars(torch.utils.data.Dataset):
         subpath = subdirs_path / "train" if train else subdirs_path / "test"
 
         self.root_path = Path(root_path) / "stanford-cars"
-        self.split_path = Path(root_path) / subpath
+        self.split_path = self.root_path / subpath
         self.is_train_split = train
         self.transforms = transforms
 
