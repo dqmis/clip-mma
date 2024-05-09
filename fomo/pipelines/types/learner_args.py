@@ -32,14 +32,12 @@ class LearnerArgs:
         self.run_id = f"{self.model_type}_{self.model_backbone}_{str(int(time.time()))}".replace(
             "/", ""
         ).lower()
-
         self.output_dir = os.path.join(self.output_dir, self.run_id)
 
-        # create output directory if it does not exist
+    def save_config(self) -> None:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-        # save the config as json
         with open(os.path.join(self.output_dir, "config.json"), "w") as f:
             data = self.to_dict()
             json.dump(data, f, indent=4)

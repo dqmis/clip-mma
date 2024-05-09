@@ -119,7 +119,9 @@ class Learner:
 
     def run(self) -> None:
         """Runs training for the specified number of epochs."""
-        
+
+        self._lr_args.save_config()
+
         if self._lr_args.use_wandb:
             wandb.init(
                 project="fomo",
@@ -252,7 +254,6 @@ class Learner:
 
                 output = self.model(images)
                 loss = self.criterion(output, target)
-                
 
                 acc1 = accuracy(output, target, topk=(1,))
                 losses.update(loss.item(), images.size(0))
