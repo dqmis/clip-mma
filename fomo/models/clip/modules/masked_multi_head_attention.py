@@ -3,14 +3,20 @@ from torch import nn
 
 
 class MaskedMultiheadAttention(nn.Module):
-    def __init__(self, num_heads: int = 2) -> None:
+    def __init__(self, num_heads: int = 4) -> None:
         super(MaskedMultiheadAttention, self).__init__()
 
         self._num_heads = num_heads
 
-        self.mha = nn.MultiheadAttention(embed_dim=512, num_heads=self._num_heads, dropout=0.3)
+        self.mha = nn.MultiheadAttention(embed_dim=512, num_heads=self._num_heads)
         self._attn_mask: torch.Tensor = self._init_attn_mask(1, 1)
-        
+        self.linear = nn.Sequential(
+            nn.LayerNorm(512),
+            nn.Linear(512, 32),
+            nn.GELU(),
+            nn.Linear(32, 512),
+        )
+
     @property
     def device(self) -> torch.device:
         return next(self.parameters()).device
@@ -39,4 +45,5 @@ class MaskedMultiheadAttention(nn.Module):
         mask = self._attn_mask.clone().unsqueeze(0).repeat(batch_size * self._num_heads, 1, 1).to(self.device)
 
         output, _ = self.mha.forward(inputs, inputs, inputs, attn_mask=mask)
+        output = self.linear(output)
         return output
