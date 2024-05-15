@@ -79,11 +79,9 @@ class Learner:
         self._configure_trainable_params()
 
         # Define criterion and optimizer
-        self.optimizer = torch.optim.SGD(
+        self.optimizer = torch.optim.Adam(
             filter(lambda p: p.requires_grad, self.model.parameters()),
-            lr=self._lr_args.learning_rate,
-            momentum=self._lr_args.momentum,
-            weight_decay=self._lr_args.weight_decay,
+            lr=self._lr_args.learning_rate
         )
 
         self.criterion = nn.CrossEntropyLoss()
@@ -191,7 +189,7 @@ class Learner:
 
             # Adjust learning rate
             step = num_batches_per_epoch * epoch + i
-            self.scheduler(step)
+            #self.scheduler(step)
 
             self.optimizer.zero_grad()
             images = images.to(self.model.device)

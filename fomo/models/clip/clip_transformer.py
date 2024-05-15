@@ -1,4 +1,6 @@
 # import ClipBase
+from typing import Self
+
 import torch
 
 from fomo.models.clip.clip_base import ClipBase
@@ -18,6 +20,16 @@ class ClipTransformer(ClipBase):
     def learnable_param_names(self) -> set[str]:
         # IMPORTANT: Add the name of the learnable parameters in the model
         return set(["mmha"])
+
+    def eval(self) -> Self:
+        self._clip.eval()
+        self.mmha.eval()
+        return self
+
+    def train_(self) -> Self:
+        self._clip.train()
+        self.mmha.train()
+        return self
 
     # If needed you can override the to_cpu and to_cuda methods
     def to_cpu(self) -> None:
@@ -43,13 +55,13 @@ class ClipTransformer(ClipBase):
         num_classes = text_features.shape[0]
 
         input_seq = torch.cat([text_features, image_features], dim=0)
-        tr_outputs = self.mmha.forward(input_seq)[0]
+        tr_outputs = self.mmha.forward(input_seq)
 
         input_seq = input_seq + tr_outputs
 
-        _image_features = input_seq[num_classes:].permute(1, 0, 2).transpose(1, 2)
+        _image_features = input_seq[num_classes:].permute(1, 0, 2).transpose(1, 2).squeeze().unsqueeze(1)
         _text_features = input_seq[:num_classes].permute(1, 0, 2)
 
-        logits_per_image: torch.Tensor = torch.bmm(_text_features, _image_features).squeeze(-1)
+        logits_per_image: torch.Tensor = torch.bmm(_image_features, _text_features.transpose(1, 2)).squeeze(1)
 
         return logits_per_image
