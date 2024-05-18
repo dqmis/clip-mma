@@ -45,6 +45,8 @@ def intialize_model(model_type: str, backbone: str, device: str) -> ClipBase:
     model = MODELS[model_type](backbone=backbone)
     if device == "cuda":
         model.to_cuda()
+    elif device == "mps":
+        model.to_mps()
     else:
         model.to_cpu()
 
