@@ -87,7 +87,9 @@ class Learner:
 
         # Define criterion and optimizer
         self.optimizer = torch.optim.Adam(
-            filter(lambda p: p.requires_grad, self.model.parameters()), lr=self._lr_args.learning_rate
+            filter(lambda p: p.requires_grad, self.model.parameters()),
+            lr=self._lr_args.learning_rate,
+            weight_decay=self._lr_args.weight_decay
         )
 
         self.criterion = nn.CrossEntropyLoss()
