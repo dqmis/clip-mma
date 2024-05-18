@@ -37,6 +37,10 @@ class ClipTransformer(ClipBase):
         self.mmha.to(torch.device("cpu"))
         self._clip.float()
 
+    def to_mps(self) -> None:
+        self._clip.to(torch.device("mps"))
+        self.mmha.to(torch.device("mps"))
+
     def to_cuda(self) -> None:
         self.mmha.to(torch.device("cuda"))
         self._clip.to(torch.device("cuda"))

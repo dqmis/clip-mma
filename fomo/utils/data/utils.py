@@ -58,7 +58,9 @@ def subsample_classes(dataset: Dataset, subsample: str = "all") -> tuple[Dataset
 
 
 def split_train_val(
-    dataset: Dataset, train_size: float | None = None, train_eval_samples: tuple[int, int] | None = None
+    dataset: Dataset,
+    train_size: float | None = None,
+    train_eval_samples: tuple[int, int] | None = None,
 ) -> list[Subset[Any]]:
     """
     If train_size is provided, it will split the dataset into train and validation sets based on

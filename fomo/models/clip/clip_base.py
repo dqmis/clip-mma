@@ -41,6 +41,9 @@ class ClipBase(nn.Module):
         self._clip.to(torch.device("cpu"))
         self._clip.float()
 
+    def to_mps(self) -> None:
+        self._clip.to(torch.device("mps"))
+
     def to_cuda(self) -> None:
         self._clip.to(torch.device("cuda"))
 
