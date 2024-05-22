@@ -17,8 +17,8 @@ class ClipExtension(ClipBase):
 
         # add additional blocks to the model
 
-        self.image_linear = nn.Linear(512, 10)
-        self.text_linear = nn.Linear(10,10)
+        self.image_linear = nn.Linear(512, 37)
+        self.text_linear = nn.Linear(37,37)
         
         
         self.image_linear.apply(init_weights)

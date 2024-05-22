@@ -60,13 +60,13 @@ class Learner:
 
         set_seed(self._lr_args.seed)
 
-        if self._lr_args.use_wandb:
-            wandb.init(
-                project="fomo",
-                name=self._lr_args.run_id,
-                config=self._lr_args.to_dict(),
-                reinit=True,
-            )
+        # if self._lr_args.use_wandb:
+        #     wandb.init(
+        #         project="fomo",
+        #         name=self._lr_args.run_id,
+        #         config=self._lr_args.to_dict(),
+        #         reinit=True,
+        #     )
 
         self.best_acc1 = 0.0
 
@@ -77,6 +77,7 @@ class Learner:
         self.transforms = self.model.transforms
 
         (train_dataset, test_dataset), labels = initalize_datasets(self._lr_args.dataset, self.transforms)
+        #print(labels)
 
         self.train_loader, self.val_loader, self.test_loader = initalize_dataloaders(
             train_dataset, test_dataset, self._lr_args
@@ -88,12 +89,19 @@ class Learner:
         self._configure_trainable_params()
 
         # Define criterion and optimizer
-        self.optimizer = torch.optim.SGD(
-            filter(lambda p: p.requires_grad, self.model.parameters()),
-            lr=self._lr_args.learning_rate,
-            momentum=self._lr_args.momentum,
-            weight_decay=self._lr_args.weight_decay,
-        )
+        # self.optimizer = torch.optim.SGD(
+        #     filter(lambda p: p.requires_grad, self.model.parameters()),
+        #     lr=self._lr_args.learning_rate,
+        #     momentum=self._lr_args.momentum,
+        #     weight_decay=self._lr_args.weight_decay,
+        # )
+        self.optimizer = torch.optim.Adam(
+        filter(lambda p: p.requires_grad, self.model.parameters()),
+        lr=self._lr_args.learning_rate,
+        betas=(self._lr_args.beta1, self._lr_args.beta2),
+        eps=self._lr_args.eps,
+        weight_decay=self._lr_args.weight_decay,
+    )
 
         self.criterion = nn.CrossEntropyLoss()
         self.scaler = GradScaler()
@@ -130,6 +138,20 @@ class Learner:
 
     def run(self) -> None:
         """Runs training for the specified number of epochs."""
+        self._lr_args.save_config()
+        if self._lr_args.use_wandb:
+            wandb.init(
+                project="fomo",
+
+                name=self._lr_args.run_id,
+
+                config=self._lr_args.to_dict(),
+
+                reinit=True,
+
+            )
+
+
 
         epochs_since_improvement = 0
 
@@ -165,8 +187,9 @@ class Learner:
                     break
 
         # loading best model
-        self.model.load_state_dict(torch.load(f"{self._lr_args.output_dir}/model_best.pth.tar")["state_dict"])
+        self.model.load_state_dict(torch.load(f"{self._lr_args.output_dir}/oxford_pets_model_best.pth.tar")["state_dict"])
         # evaluate on test set
+        print("TEST MODE EVALUATION")
         self.evaluate("test")
 
     def train_one_epoch(self, epoch: int) -> tuple[float, float]:
@@ -197,7 +220,7 @@ class Learner:
             self.optimizer.zero_grad()
             images = images.to(self.model.device)
             targets = targets.to(self.model.device)
-            outputs = self.model(images)
+            outputs= self.model(images).squeeze(-1)
             outputs = outputs.to(self.model.device)
 
             loss = self.criterion(outputs, targets)

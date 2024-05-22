@@ -29,9 +29,12 @@ def _get_train_val_idx(dataset: Dataset, train_eval_samples: tuple[int, int]) ->
     y_labels = [dataset[i][1] for i in range(len(dataset))]  # type: ignore
     class_count = len(set(y_labels))
     train_samples, val_samples = train_eval_samples
+    print("No of classes:",class_count)
+    print("Length of train_samples:",train_samples)
+    print("Length of val_samples:",val_samples)
 
-    if train_samples % class_count != 0 or val_samples % class_count != 0:
-        raise ValueError("train_samples and val_samples must be divisible by the number of classes.")
+    # if train_samples % class_count != 0 or val_samples % class_count != 0:
+    #     raise ValueError("train_samples and val_samples must be divisible by the number of classes.")
 
     train_idx, val_idx = train_test_split(
         range(len(dataset)),  # type: ignore

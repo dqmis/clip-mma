@@ -23,11 +23,14 @@ class LearnerArgs:
     train_size: Union[float, None] = None
     train_eval_size:  Union[tuple[int, int], None] = None
     text_prompt_template: str = "a photo of {}."
-    learning_rate: float = 0.01
+    learning_rate: float = 0.0001
     momentum: float = 0.9
     weight_decay: float = 1e-4
     warmup: int = 0
     seed: int = 42
+    beta1: float = 0.9
+    beta2: float = 0.999
+    eps: float = 1e-8
 
     def __post_init__(self) -> None:
         self.run_id = f"{self.model_type}_{self.model_backbone}_{str(int(time.time()))}".replace(
@@ -44,6 +47,15 @@ class LearnerArgs:
         with open(os.path.join(self.output_dir, "config.json"), "w") as f:
             data = self.to_dict()
             json.dump(data, f, indent=4)
+    
+    def save_config(self) -> None:
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        with open(os.path.join(self.output_dir, "config.json"), "w") as f:
+            data = self.to_dict()
+            json.dump(data, f, indent=4)
+
 
     def to_dict(self) -> dict[str, Any]:
         return self.__dict__

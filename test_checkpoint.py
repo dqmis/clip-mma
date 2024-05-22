@@ -12,17 +12,17 @@ from fomo.pipelines.types.learner_args import LearnerArgs
 
 
 if __name__ == "__main__":
-    dataset_name = 'cifar10'
+    dataset_name = 'OXFORD_FLOWERS'
     
     
     learner_args = LearnerArgs()
-    learner_args.model_type = "clip_extension"
+    learner_args.model_type = "clip_linear"
     learner_args.train_size = 0.8
 
     learner = Learner(learner_args)
 
 
-    checkpoint = torch.load('/home/schatterjee/FOMO/fomo/output/clip_base_vit-b16_1715101582/checkpoint.pth.tar')
+    checkpoint = torch.load('/home/schatterjee/FOMO/fomo/output/clip_base_vit-b16_1715717945/oxford_flowers_model_best.pth.tar')
     learner.model.load_state_dict(checkpoint['state_dict'])
 
     

@@ -127,7 +127,7 @@ def save_checkpoint(
     filename: str = "checkpoint.pth.tar",
 ) -> None:
     savefile = os.path.join(model_folder, filename)
-    bestfile = os.path.join(model_folder, "model_best.pth.tar")
+    bestfile = os.path.join(model_folder, "oxford_pets_model_best.pth.tar")
     torch.save(state, savefile)
     if is_best:
         shutil.copyfile(savefile, bestfile)
