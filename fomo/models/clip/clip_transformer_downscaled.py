@@ -24,7 +24,6 @@ class ClipTransformerDownscaled(ClipBase):
         self.image_upsample = nn.Linear(down_dim, 512, bias=False)
         self.text_upsample = nn.Linear(down_dim, 512, bias=False)
 
-
     @property
     def learnable_param_names(self) -> set[str]:
         # IMPORTANT: Add the name of the learnable parameters in the model
