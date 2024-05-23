@@ -70,7 +70,7 @@ class ClipTransformerWHypernet(ClipBase):
 
         # Hypernetworks
         self.image_hypernetwork = HyperNet(embed_dim=down_dim)
-        self.text_hypernetwork = HyperNet(embed_dim=down_dim)
+        # self.text_hypernetwork = HyperNet(embed_dim=down_dim)
 
     @property
     def learnable_param_names(self) -> set[str]:
@@ -83,7 +83,7 @@ class ClipTransformerWHypernet(ClipBase):
                 "image_upsample",
                 "text_upsample",
                 "image_hypernetwork",
-                "text_hypernetwork",
+                # "text_hypernetwork",
             ]
         )
 
@@ -97,7 +97,7 @@ class ClipTransformerWHypernet(ClipBase):
         self.image_upsample.to(torch.device("cpu"))
         self.text_upsample.to(torch.device("cpu"))
         self.image_hypernetwork.to(torch.device("cpu"))
-        self.text_hypernetwork.to(torch.device("cpu"))
+        # self.text_hypernetwork.to(torch.device("cpu"))
 
     def to_mps(self) -> None:
         self._clip.to(torch.device("mps"))
@@ -107,7 +107,7 @@ class ClipTransformerWHypernet(ClipBase):
         self.image_upsample.to(torch.device("mps"))
         self.text_upsample.to(torch.device("mps"))
         self.image_hypernetwork.to(torch.device("mps"))
-        self.text_hypernetwork.to(torch.device("mps"))
+        # self.text_hypernetwork.to(torch.device("mps"))
 
     def to_cuda(self) -> None:
         self._clip.to(torch.device("cuda"))
@@ -117,7 +117,7 @@ class ClipTransformerWHypernet(ClipBase):
         self.image_upsample.to(torch.device("cuda"))
         self.text_upsample.to(torch.device("cuda"))
         self.image_hypernetwork.to(torch.device("cuda"))
-        self.text_hypernetwork.to(torch.device("cuda"))
+        # self.text_hypernetwork.to(torch.device("cuda"))
 
     def forward(self, images: torch.Tensor, prompts: list[str] | None = None) -> torch.Tensor:
         if prompts:
