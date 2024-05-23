@@ -3,6 +3,7 @@ import time
 
 import torch
 import torch.nn as nn
+import torch.utils
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
@@ -17,6 +18,7 @@ from fomo.pipelines.types.learner_args import LearnerArgs
 from fomo.pipelines.utils.initializers import (
     initalize_dataloaders,
     initalize_datasets,
+    initalize_test_dataloader_subsample,
     intialize_model,
 )
 from fomo.pipelines.utils.utils import (
@@ -67,21 +69,25 @@ class Learner:
         )
         self.transforms = self.model.transforms
 
-        (train_dataset, test_dataset), labels = initalize_datasets(self._lr_args.dataset, self.transforms)
+        (train_dataset, test_dataset), (train_labels, test_labels) = initalize_datasets(
+            self._lr_args.dataset,
+            self.transforms,
+            self._lr_args.train_subsample,
+            self._lr_args.test_subsample,
+        )
+
+        self.train_labels = train_labels
+        self.test_labels = test_labels
 
         self.train_loader, self.val_loader, self.test_loader = initalize_dataloaders(
             train_dataset, test_dataset, self._lr_args
         )
 
-        # precompute prompt features
-        self.model.precompute_prompt_features(build_label_prompts(labels, self._lr_args.text_prompt_template))
-
         self._configure_trainable_params()
 
         # Define criterion and optimizer
         self.optimizer = torch.optim.Adam(
-            filter(lambda p: p.requires_grad, self.model.parameters()),
-            lr=self._lr_args.learning_rate
+            filter(lambda p: p.requires_grad, self.model.parameters()), lr=self._lr_args.learning_rate
         )
 
         self.criterion = nn.CrossEntropyLoss()
@@ -163,8 +169,11 @@ class Learner:
 
         # loading best model
         self.model.load_state_dict(torch.load(f"{self._lr_args.output_dir}/model_best.pth.tar")["state_dict"])
+
         # evaluate on test set
-        self.evaluate("test")
+        self.evaluate("test_all")
+        self.evaluate("test_base")
+        self.evaluate("test_new")
 
     def train_one_epoch(self, epoch: int) -> tuple[float, float]:
         batch_time = AverageMeter("Time", ":6.3f")
@@ -180,6 +189,11 @@ class Learner:
         # Switch to train mode
         self.model.train()
 
+        # precompute train prompt features
+        self.model.precompute_prompt_features(
+            build_label_prompts(self.train_labels, self._lr_args.text_prompt_template)
+        )
+
         num_batches_per_epoch = len(self.train_loader)
 
         end = time.time()
@@ -189,7 +203,7 @@ class Learner:
 
             # Adjust learning rate
             step = num_batches_per_epoch * epoch + i
-            #self.scheduler(step)
+            # self.scheduler(step)
 
             self.optimizer.zero_grad()
             images = images.to(self.model.device)
@@ -231,10 +245,23 @@ class Learner:
 
     def evaluate(self, split: str = "valid") -> float:
         """Evaluates the model on the given `split` set and returns average accuracy."""
+        if split == "valid":
+            loader = self.val_loader
+        else:
+            test_subsample = split.split("_")[-1]
+            loader, test_labels = initalize_test_dataloader_subsample(
+                self._lr_args.dataset, self.transforms, self._lr_args, test_subsample
+            )
+
+            # precompute train prompt features
+            self.model.precompute_prompt_features(
+                build_label_prompts(test_labels, self._lr_args.text_prompt_template)
+            )
+
         batch_time = AverageMeter("Time", ":6.3f")
         losses = AverageMeter("Loss", ":.4e")
         top1_prompt = AverageMeter("Prompt Acc@1", ":6.2f")
-        loader = self.val_loader if split == "valid" else self.test_loader
+
         progress = ProgressMeter(
             len(loader),
             [batch_time, losses, top1_prompt],
