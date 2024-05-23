@@ -27,6 +27,8 @@ class LearnerArgs:
     weight_decay: float = 1e-4
     warmup: int = 0
     seed: int = 42
+    train_subsample: str = "all"
+    test_subsample: str = "all"
 
     def __post_init__(self) -> None:
         self.run_id = f"{self.model_type}_{self.model_backbone}_{str(int(time.time()))}".replace(
