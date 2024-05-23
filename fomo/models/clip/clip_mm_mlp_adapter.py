@@ -77,8 +77,12 @@ class CLIPMMMLPAdapter(ClipBase):
         image_adapter_output = self.mm_to_visual_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
         text_adapter_output = self.mm_to_text_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
 
-        image_features_exp = (1 - ratio) * image_features_exp + ratio * image_adapter_output  # [batch_size, n_classes, rep_dim]
-        text_features_exp = (1 - ratio) * text_features_exp + ratio * text_adapter_output  # [batch_size, n_classes, rep_dim]
+        image_features_exp = (
+            1 - ratio
+        ) * image_features_exp + ratio * image_adapter_output  # [batch_size, n_classes, rep_dim]
+        text_features_exp = (
+            1 - ratio
+        ) * text_features_exp + ratio * text_adapter_output  # [batch_size, n_classes, rep_dim]
 
         image_features_exp = image_features_exp / image_features_exp.norm(dim=-1, keepdim=True)
         text_features_exp = text_features_exp / text_features_exp.norm(dim=-1, keepdim=True)
