@@ -61,10 +61,15 @@ class ClipTransformer(ClipBase):
         input_seq = torch.cat([text_features, image_features], dim=0)
         tr_outputs = self.mmha.forward(input_seq)
 
-        input_seq = input_seq + tr_outputs
+        _image_features = (
+            (image_features + tr_outputs[num_classes:])
+            .permute(1, 0, 2)
+            .transpose(1, 2)
+            .squeeze()
+            .unsqueeze(1)
+        )
 
-        _image_features = input_seq[num_classes:].permute(1, 0, 2).transpose(1, 2).squeeze().unsqueeze(1)
-        _text_features = input_seq[:num_classes].permute(1, 0, 2)
+        _text_features = text_features.permute(1, 0, 2)
 
         logits_per_image: torch.Tensor = torch.bmm(_image_features, _text_features.transpose(1, 2)).squeeze(1)
 
