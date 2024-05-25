@@ -61,6 +61,8 @@ class CLIPTransformerAdapter(ClipBase):
         adapter_image_features = adapter_output[num_classes:].squeeze(0)
         adapter_text_features = adapter_output[:num_classes].mean(dim=1)
         
+        adapter_image_features = adapter_image_features / adapter_image_features.norm(dim=-1, keepdim=True)
+        
         image_ratio = 0.2
         image_features = image_ratio * adapter_image_features + (1 - image_ratio) * image_features
 
