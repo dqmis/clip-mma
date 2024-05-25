@@ -3,7 +3,7 @@ from typing import Callable, Self
 
 from torchvision import datasets
 
-from fomo.utils.data.datasets import _labels, stanford_cars
+from fomo.utils.data.datasets import _labels, oxford_flowers, stanford_cars
 from fomo.utils.data.zero_shot_dataset import ZeroShotDataset
 
 
@@ -20,7 +20,7 @@ class CIFAR10(ZeroShotDataset):
 
 class OxfordFlowers(ZeroShotDataset):
     def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
-        dataset = datasets.Flowers102(
+        dataset = oxford_flowers.OxfordFlowers(
             root=root, split="train" if train else "test", download=True, transform=transforms
         )
 
