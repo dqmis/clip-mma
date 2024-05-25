@@ -2,16 +2,20 @@ import torch
 from torch import nn
 
 
-class MaskedMultiheadAttention(nn.Module):
-    def __init__(self, embed_dim=512, num_heads: int = 4) -> None:
-        super(MaskedMultiheadAttention, self).__init__()
+class MaskedMultiheadAttentionDownsampled(nn.Module):
+    def __init__(self, embed_dim=512, downsamling_dim=128, num_heads: int = 4) -> None:
+        super(MaskedMultiheadAttentionDownsampled, self).__init__()
 
         self._num_heads = num_heads
 
-        self.mha = nn.MultiheadAttention(embed_dim, num_heads=self._num_heads)
-        self._attn_mask: torch.Tensor = self._init_attn_mask(1, 1)
-        self.linear = nn.Sequential(
+        self.downsampler = nn.Sequential(
             nn.Linear(embed_dim, 32),
+            nn.Linear(32, downsamling_dim),
+        )
+        self.mha = nn.MultiheadAttention(downsamling_dim, num_heads=self._num_heads)
+        self._attn_mask: torch.Tensor = self._init_attn_mask(1, 1)
+        self.upsampler = nn.Sequential(
+            nn.Linear(downsamling_dim, 32),
             nn.GELU(),
             nn.Linear(32, embed_dim),
         )
@@ -42,7 +46,8 @@ class MaskedMultiheadAttention(nn.Module):
             self._attn_mask = self._init_attn_mask(seq_len - 1, 1)
 
         mask = self._attn_mask.clone().unsqueeze(0).repeat(batch_size * self._num_heads, 1, 1).to(self.device)
-
-        output, _ = self.mha.forward(inputs, inputs, inputs, attn_mask=mask)
-        output = self.linear(output)
+    
+        output = self.downsampler(inputs)
+        output, _ = self.mha.forward(output, output, output, attn_mask=mask)
+        output = self.upsampler(output)
         return output
