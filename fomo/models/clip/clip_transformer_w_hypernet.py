@@ -145,10 +145,10 @@ class ClipTransformerWHypernet(ClipBase):
 
         tr_outputs = self.mmha.forward(input_seq)
 
-        input_seq = input_seq + tr_outputs
+        #input_seq = input_seq + tr_outputs
 
-        _image_features = input_seq[num_classes:]  # [1, batch_size, embed_dim]
-        _text_features = input_seq[:num_classes]  # [n_classes, batch_size, embed_dim]
+        _image_features = tr_outputs[num_classes:]  # [1, batch_size, embed_dim]
+        _text_features = tr_outputs[:num_classes]  # [n_classes, batch_size, embed_dim]
 
         _image_features = _image_features.permute(1, 0, 2)  # [batch_size, 1, embed_dim]
         _text_features = _text_features.permute(1, 0, 2)  # [batch_size, n_classes, embed_dim]
