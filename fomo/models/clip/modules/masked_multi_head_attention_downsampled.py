@@ -3,7 +3,7 @@ from torch import nn
 
 
 class MaskedMultiheadAttentionDownsampled(nn.Module):
-    def __init__(self, embed_dim=512, downsamling_dim=128, num_heads: int = 4) -> None:
+    def __init__(self, embed_dim=512, downsamling_dim=256, num_heads: int = 4) -> None:
         super(MaskedMultiheadAttentionDownsampled, self).__init__()
 
         self._num_heads = num_heads

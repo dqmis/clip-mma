@@ -1,0 +1,17 @@
+Dataset;Share;Base acc %;New acc %
+FGVCAircraft		;Base equal;31.87;35.15
+Caltech101;Base equal;97.87;94.1
+OxfordFlowers;Base equal;76.26;76.17
+OxfordPets;Base equal;93.89;97.24
+FGVCAircraft		;Base 3x larger;27.18;44.18
+Caltech101;Base 3x larger;96.15;99.16
+OxfordFlowers;Base 3x larger;73.2;83.36
+OxfordPets;Base 3x larger;93.39;97.98
+FGVCAircraft		;Base 4x larger;30.32;47.06
+Caltech101;Base 4x larger;96.59;98.95
+OxfordFlowers;Base 4x larger;75.28;83.6
+OxfordPets;Base 4x larger;90.76;99.43
+FGVCAircraft		;Base 5x larger;29.33;49.18
+Caltech101;Base 5x larger;95.78;99.256
+OxfordFlowers;Base 5x larger;75.12;84.51
+OxfordPets;Base 5x larger;91.21;99.56

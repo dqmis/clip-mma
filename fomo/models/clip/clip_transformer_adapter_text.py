@@ -10,20 +10,6 @@ from fomo.models.clip.modules.masked_multi_head_attention_downsampled import (
 )
 
 
-class Adapter(nn.Module):
-    def __init__(self, c_in, reduction=4):
-        super(Adapter, self).__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(c_in, c_in // reduction, bias=False),
-            nn.ReLU(inplace=True),
-            nn.Linear(c_in // reduction, c_in, bias=False),
-            nn.ReLU(inplace=True)
-        )
-
-    def forward(self, x):
-        x = self.fc(x)
-        return x
-
 class CLIPTransformerAdapterText(ClipBase):
     """Reproduction of CLIP-Adapter"""
 
@@ -34,12 +20,11 @@ class CLIPTransformerAdapterText(ClipBase):
         self.image_encoder = self._clip.visual
         self.logit_scale = self._clip.logit_scale
         self.adapter = MaskedMultiheadAttentionDownsampled()
-        self.image_adapter = Adapter(512, 4).to(torch.float32)
 
     @property
     def learnable_param_names(self) -> set[str]:
         # IMPORTANT: Add the name of the learnable parameters in the model
-        return set(["adapter", "image_adapter"])
+        return set(["adapter"])
 
     # If needed you can override the to_cpu and to_cuda methods
     def to_cpu(self) -> None:
@@ -49,7 +34,6 @@ class CLIPTransformerAdapterText(ClipBase):
 
     def to_cuda(self) -> None:
         self.adapter.to(torch.device("cuda"))
-        self.image_adapter.to(torch.device("cuda"))
         self._clip.to(torch.device("cuda"))
 
     def forward(self, images: torch.Tensor, prompts: list[str] | None = None) -> torch.Tensor:
@@ -78,9 +62,7 @@ class CLIPTransformerAdapterText(ClipBase):
 
         adapter_image_features = adapter_output[num_classes:]
         adapter_text_features = adapter_output[:num_classes]
-        
-        adapter_image_features = self.image_adapter(adapter_image_features)
-        
+                
         adapter_image_features = adapter_image_features / adapter_image_features.norm(dim=-1, keepdim=True)
         adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
         
