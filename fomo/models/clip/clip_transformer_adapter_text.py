@@ -17,12 +17,13 @@ class Adapter(nn.Module):
             nn.Linear(c_in, c_in // reduction, bias=False),
             nn.ReLU(inplace=True),
             nn.Linear(c_in // reduction, c_in, bias=False),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
         x = self.fc(x)
         return x
+
 
 class CLIPTransformerAdapterText(ClipBase):
     """Reproduction of CLIP-Adapter"""
@@ -52,7 +53,9 @@ class CLIPTransformerAdapterText(ClipBase):
         self.image_adapter.to(torch.device("cuda"))
         self._clip.to(torch.device("cuda"))
 
-    def forward(self, images: torch.Tensor, prompts: list[str] | None = None) -> torch.Tensor:
+    def encode_features(
+        self, images: torch.Tensor, prompts: list[str] | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         # Change the forward method to include the visual_mlp
         if prompts:
             text_features = self.encode_text(prompts)
@@ -64,8 +67,11 @@ class CLIPTransformerAdapterText(ClipBase):
         image_features = self.encode_images(images).to(torch.float32)  # [batch_size, rep_dim]
         text_features = text_features.to(torch.float32)  # [n_classes, rep_dim]
 
+        original_image_features = image_features.clone()
+        original_text_features = text_features.clone()
+
         num_classes = text_features.shape[0]
-        
+
         text_features = text_features.unsqueeze(1).expand(-1, image_features.shape[0], -1)
         image_features = image_features.unsqueeze(0)
 
@@ -78,26 +84,32 @@ class CLIPTransformerAdapterText(ClipBase):
 
         adapter_image_features = adapter_output[num_classes:]
         adapter_text_features = adapter_output[:num_classes]
-        
+
         adapter_image_features = self.image_adapter(adapter_image_features)
-        
+
         adapter_image_features = adapter_image_features / adapter_image_features.norm(dim=-1, keepdim=True)
         adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
-        
-        
+
         image_ratio = 0.2
         text_ratio = 0.2
-        
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        
-        image_features = image_ratio * adapter_image_features + (1 - image_ratio) * image_features
-        text_features = text_ratio * adapter_text_features  + (1 - text_ratio) * text_features
-        
+
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
+        image_features = image_ratio * adapter_image_features + (1 - image_ratio) * image_features
+        text_features = text_ratio * adapter_text_features + (1 - text_ratio) * text_features
+
+        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+
+        return image_features, text_features, original_image_features, original_text_features
+
+    def forward(self, images: torch.Tensor, prompts: list[str] | None = None) -> torch.Tensor:
+        image_features, text_features, _, _ = self.encode_features(images, prompts)
+
         logit_scale = self.logit_scale.exp()
-        logits_per_image: torch.Tensor = logit_scale * torch.bmm(image_features.permute(1, 0, 2), text_features.permute(1, 2, 0)).squeeze(1)
+        logits_per_image: torch.Tensor = logit_scale * torch.bmm(
+            image_features.permute(1, 0, 2), text_features.permute(1, 2, 0)
+        ).squeeze(1)
 
         return logits_per_image
