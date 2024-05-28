@@ -20,6 +20,7 @@ scipy = "^1.13.0"
 matplotlib = "^3.8.4"
 openai-clip = "^1.0.1"
 ipykernel = "^6.29.4"
+gdown = "^5.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

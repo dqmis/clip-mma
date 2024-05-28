@@ -11,22 +11,24 @@ class CLIPMMMLPAdapter(ClipBase):
         # pass default arguments to the parent class
         super(CLIPMMMLPAdapter, self).__init__(backbone, root=root)
 
-        # add additional blocks to the model
         representation_dim = self._clip.visual.output_dim
         adapter_input_dim = representation_dim * 2
         output_dim = representation_dim
-        hidden_size = 4
+        reduction = 32
+        hidden_size = adapter_input_dim // reduction
 
         self.mm_to_visual_mlp = nn.Sequential(
-            nn.Linear(adapter_input_dim, hidden_size),
-            nn.GELU(),
-            nn.Linear(hidden_size, output_dim),
+            nn.Linear(adapter_input_dim, hidden_size, bias=False),
+            nn.ReLU(),
+            nn.Linear(hidden_size, output_dim, bias=False),
+            nn.ReLU(),
         )
 
         self.mm_to_text_mlp = nn.Sequential(
-            nn.Linear(adapter_input_dim, hidden_size),
-            nn.GELU(),
-            nn.Linear(hidden_size, output_dim),
+            nn.Linear(adapter_input_dim, hidden_size, bias=False),
+            nn.ReLU(),
+            nn.Linear(hidden_size, output_dim, bias=False),
+            nn.ReLU(),
         )
 
     @property
@@ -70,11 +72,20 @@ class CLIPMMMLPAdapter(ClipBase):
             (image_features_exp, text_features_exp), dim=2
         )  # [batch_size, n_classes, rep_dim * 2]
 
-        image_adapter_ouptut = self.mm_to_visual_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
-        text_adapter_ouptut = self.mm_to_text_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
+        ratio = 0.2
 
-        image_features_exp = image_features_exp + image_adapter_ouptut  # [batch_size, n_classes, rep_dim]
-        text_features_exp = text_features_exp + text_adapter_ouptut  # [batch_size, n_classes, rep_dim]
+        image_adapter_output = self.mm_to_visual_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
+        text_adapter_output = self.mm_to_text_mlp(combined_features)  # [batch_size, n_classes, rep_dim]
+
+        image_features_exp = (
+            1 - ratio
+        ) * image_features_exp + ratio * image_adapter_output  # [batch_size, n_classes, rep_dim]
+        text_features_exp = (
+            1 - ratio
+        ) * text_features_exp + ratio * text_adapter_output  # [batch_size, n_classes, rep_dim]
+
+        image_features_exp = image_features_exp / image_features_exp.norm(dim=-1, keepdim=True)
+        text_features_exp = text_features_exp / text_features_exp.norm(dim=-1, keepdim=True)
 
         logits_per_image: torch.Tensor = self.logit_scale * (image_features_exp * text_features_exp).sum(
             dim=-1

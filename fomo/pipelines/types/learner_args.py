@@ -26,12 +26,13 @@ class LearnerArgs:
     momentum: float = 0.9
     weight_decay: float = 1e-4
     warmup: int = 0
+    info: str | None = None
     seed: int = 42
     train_subsample: str = "all"
     test_subsample: str = "all"
 
     def __post_init__(self) -> None:
-        self.run_id = f"{self.model_type}_{self.model_backbone}_{str(int(time.time()))}".replace(
+        self.run_id = f"{self.model_type}_{self.dataset}_{str(int(time.time()))}".replace(
             "/", ""
         ).lower()
         self.output_dir = os.path.join(self.output_dir, self.run_id)

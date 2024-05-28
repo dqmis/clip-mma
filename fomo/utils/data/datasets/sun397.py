@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional, Tuple
 
 import requests
+import os
 from PIL import Image
 from torchvision.datasets import SUN397 as _SUN397
 
@@ -24,6 +25,8 @@ class SUN397(_SUN397):
         download: bool = False,
     ) -> None:
         super().__init__(root=root, transform=transform, target_transform=target_transform, download=download)
+        self.split = split
+        self.root = root
 
         self._data_dir = Path(self.root) / "SUN397"
         self._split_dict = self._download_split()
@@ -52,7 +55,7 @@ class SUN397(_SUN397):
 
     def __getitem__(self, idx: int) -> Tuple[Any, Any]:
         image_file, label = self.data[idx], self.targets[idx]
-        image = Image.open(image_file).convert("RGB")
+        image = Image.open(os.path.join(self.root, "SUN397", image_file)).convert("RGB")
 
         if self.transform:
             image = self.transform(image)

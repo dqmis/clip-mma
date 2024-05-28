@@ -4,7 +4,7 @@ import torch
 import torch.utils
 import torch.utils.data
 from sklearn.model_selection import train_test_split
-from torch.utils.data import Dataset, Subset
+from torch.utils.data import Dataset, Subset, DataLoader
 
 
 class RemappedDataset(Dataset):
@@ -22,7 +22,15 @@ class RemappedDataset(Dataset):
         new_label = self.label_mapping[original_label]
         return img, new_label
 
-
+    
+def get_all_labels(dataset: Dataset, batch_size: int = 2048) -> list:
+    dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=4)
+    all_labels = []
+    for _, labels in dataloader:
+        all_labels.extend(labels)
+    return all_labels
+    
+    
 def subsample_classes(dataset: Dataset, subsample: str = "all") -> tuple[Dataset, list[str]]:
     """Subsamples the dataset based on the provided subsample parameter.
 
@@ -30,12 +38,17 @@ def subsample_classes(dataset: Dataset, subsample: str = "all") -> tuple[Dataset
     base - returns the base classes (first half of the classes)
     new - returns the new classes (second half of the classes)
     """
-    y_labels = [dataset[i][1] for i in range(len(dataset))]  # type: ignore
+    try:
+        y_labels = dataset.targets
+    except Exception as e:
+        y_labels = [dataset[i][1] for i in range(len(dataset))]  # type: ignore
     samples_idxs = range(len(dataset))  # type: ignore
     unique_labels = sorted(set(y_labels))
 
     base_classes = unique_labels[: len(unique_labels) // 2]
     new_classes = unique_labels[len(unique_labels) // 2 :]
+    #base_classes = unique_labels[: (len(unique_labels) - len(unique_labels) // 5)]
+    #new_classes = unique_labels[(len(unique_labels) - len(unique_labels) // 5) :]
 
     if subsample == "all":
         selected_classes = unique_labels
@@ -58,7 +71,9 @@ def subsample_classes(dataset: Dataset, subsample: str = "all") -> tuple[Dataset
 
 
 def split_train_val(
-    dataset: Dataset, train_size: float | None = None, train_eval_samples: tuple[int, int] | None = None
+    dataset: Dataset,
+    train_size: float | None = None,
+    train_eval_samples: tuple[int, int] | None = None,
 ) -> list[Subset[Any]]:
     """
     If train_size is provided, it will split the dataset into train and validation sets based on
