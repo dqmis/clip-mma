@@ -47,7 +47,7 @@ class MaskedMultiheadAttentionDownsampled(nn.Module):
             self._attn_mask = self._init_attn_mask(seq_len - 1, 1)
 
         mask = self._attn_mask.clone().unsqueeze(0).repeat(batch_size * self._num_heads, 1, 1).to(self.device)
-    
+
         output = self.downsampler(inputs)
         output, _ = self.mha.forward(output, output, output, attn_mask=mask)
         output = self.upsampler(output)
