@@ -1,17 +1,20 @@
 import json
 import os
 import ssl
+from pathlib import Path
 from typing import Any, Callable, Optional, Tuple
 
 import requests
 from PIL import Image
-from torchvision.datasets import EuroSAT as _EuroSAT
+from torch.utils.data import Dataset
+from torchvision.datasets import UCF101 as _UCF101
+from torchvision.datasets import VisionDataset
+from torchvision.datasets.utils import download_and_extract_archive
 
-ssl._create_default_https_context = ssl._create_unverified_context
 
-
-class EuroSAT(_EuroSAT):
-    _SPLIT_URL = "https://drive.usercontent.google.com/download?id=1Ip7yaCWFi0eaOFUGga0lUdVi_DDQth1o&export=download&authuser=0"
+class UCF101(VisionDataset):
+    _SPLIT_URL = "https://drive.usercontent.google.com/download?id=1I0S0q91hJfsV9Gf4xDIjgDq4AqBNJb1y&export=download&authuser=0"
+    _DATASET_URL = "https://drive.usercontent.google.com/download?id=10Jqome3vtUA2keJkNanAiFpgbyC9Hc2O&export=download&authuser=0&confirm=t&uuid=7543a322-e294-4c7a-9b80-172e644f0b02&at=APZUnTWmj4xoWwpIk0N_qZS5heJF%3A1717005803820"
 
     def _download_split(self) -> dict[str, list[int]]:
         resp = requests.get(self._SPLIT_URL)
@@ -20,19 +23,18 @@ class EuroSAT(_EuroSAT):
     def __init__(
         self,
         root: str,
-        split: str = "train",
+        train: bool = True,
         transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None,
         download: bool = False,
     ) -> None:
-        super().__init__(root=root, transform=transform, target_transform=target_transform, download=download)
+        split = "train" if train else "test"
 
+        self.transform = transform
         self.split = split
         self._split_dict = self._download_split()
 
         self.root = os.path.expanduser(root)
-        self._base_folder = os.path.join(self.root, "eurosat")
-        self._data_folder = os.path.join(self._base_folder, "2750")
+        self._data_dir = Path(self.root, "UCF-101-midframes")
 
         if download:
             self.download()
@@ -59,12 +61,17 @@ class EuroSAT(_EuroSAT):
 
     def __getitem__(self, idx: int) -> Tuple[Any, Any]:
         image_file, label = self.data[idx], self.targets[idx]
-        image = Image.open(os.path.join(self.root, "eurosat", "2750", image_file)).convert("RGB")
+        image = Image.open(os.path.join(self._data_dir, image_file)).convert("RGB")
 
         if self.transform:
             image = self.transform(image)
 
-        if self.target_transform:
-            label = self.target_transform(label)
-
         return image, label
+
+    def _check_exists(self) -> bool:
+        return self._data_dir.is_dir()
+
+    def download(self) -> None:
+        if self._check_exists():
+            return
+        download_and_extract_archive(self._DATASET_URL, download_root=self.root, filename="ucf101.zip")

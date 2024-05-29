@@ -10,6 +10,7 @@ from fomo.utils.data.datasets import (
     oxford_flowers,
     stanford_cars,
     sun397,
+    ucf101,
 )
 from fomo.utils.data.zero_shot_dataset import ZeroShotDataset
 
@@ -150,7 +151,18 @@ class EuroSAT(ZeroShotDataset):
 
     @property
     def labels(self) -> list[str]:
-        return self.dataset.classes  # type: ignore
+        return _labels.EUROSAT
+
+
+class UCF101(ZeroShotDataset):
+    def __init__(self, train: bool, root: str = "data", transforms: Callable | None = None) -> None:
+        dataset = ucf101.UCF101(root=root, train=train, transform=transforms, download=True)
+
+        super().__init__(dataset=dataset)
+
+    @property
+    def labels(self) -> list[str]:
+        return [val.replace("_", " ").lower() for val in self.dataset.categories]  # type: ignore
 
 
 PROMPTS = {
@@ -164,6 +176,8 @@ PROMPTS = {
     "fgvc_aircraft": "a photo of a {}, a type of aircraft.",
     "sun397": "a photo of a {}.",
     "dtd": "{} texture.",
+    "eurosat": "a centered satellite photo of {}.",
+    "ucf101": "a photo of a person doing {}.",
 }
 
 
@@ -178,6 +192,8 @@ class DatasetInitializer(enum.Enum):
     FGVC_AIRCRAFT = FGVCAircraft
     SUN397 = SUN397
     DTD = DTD
+    EUROSAT = EuroSAT
+    UCF101 = UCF101
 
     @classmethod
     def from_str(cls, name: str) -> Self:

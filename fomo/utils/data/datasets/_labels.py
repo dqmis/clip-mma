@@ -105,3 +105,16 @@ OXFORD_FLOWERS = [
 
 
 CIFAR10 = ["plane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
+
+EUROSAT = [
+    "Annual Crop Land",
+    "Forest",
+    "Herbaceous Vegetation Land",
+    "Highway or Road",
+    "Industrial Buildings",
+    "Pasture Land",
+    "Permanent Crop Land",
+    "Residential Buildings",
+    "River",
+    "Sea or Lake",
+]
