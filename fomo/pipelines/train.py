@@ -7,6 +7,8 @@ import torch.utils
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
+from fomo.utils.transforms.add_gaussian_noise import AddGaussianNoise
+
 try:
     from wandb import wandb
 except ImportError:
@@ -67,13 +69,20 @@ class Learner:
         self.model = intialize_model(
             self._lr_args.model_type, self._lr_args.model_backbone, self._lr_args.device
         )
-        self.transforms = self.model.transforms
+
+        self.train_transforms = self.model.transforms
+        self.eval_transforms = self.model.transforms
+
+        if self._lr_args.gaussian_noise_std > 0:
+            noise_transform = AddGaussianNoise(0.0, self._lr_args.gaussian_noise_std)
+            self.train_transforms.transforms.append(noise_transform)
 
         (train_dataset, test_dataset), (train_labels, test_labels) = initalize_datasets(
-            self._lr_args.dataset,
-            self.transforms,
-            self._lr_args.train_subsample,
-            self._lr_args.test_subsample,
+            dataset_name=self._lr_args.dataset,
+            train_transforms=self.train_transforms,
+            eval_transforms=self.eval_transforms,
+            train_subsample=self._lr_args.train_subsample,
+            test_subsample=self._lr_args.test_subsample,
         )
 
         self.train_labels = train_labels
@@ -89,7 +98,7 @@ class Learner:
         self.optimizer = torch.optim.Adam(
             filter(lambda p: p.requires_grad, self.model.parameters()),
             lr=self._lr_args.learning_rate,
-            weight_decay=self._lr_args.weight_decay
+            weight_decay=self._lr_args.weight_decay,
         )
 
         self.criterion = nn.CrossEntropyLoss()
@@ -204,7 +213,7 @@ class Learner:
             data_time.update(time.time() - end)
 
             # Adjust learning rate
-            step = num_batches_per_epoch * epoch + i
+            # step = num_batches_per_epoch * epoch + i
             # self.scheduler(step)
 
             self.optimizer.zero_grad()
@@ -252,7 +261,7 @@ class Learner:
         else:
             test_subsample = split.split("_")[-1]
             loader, test_labels = initalize_test_dataloader_subsample(
-                self._lr_args.dataset, self.transforms, self._lr_args, test_subsample
+                self._lr_args.dataset, self.eval_transforms, self._lr_args, test_subsample
             )
 
             # precompute train prompt features

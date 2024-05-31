@@ -30,11 +30,10 @@ class LearnerArgs:
     seed: int = 42
     train_subsample: str = "all"
     test_subsample: str = "all"
+    gaussian_noise_std: float = 0.0
 
     def __post_init__(self) -> None:
-        self.run_id = f"{self.model_type}_{self.dataset}_{str(int(time.time()))}".replace(
-            "/", ""
-        ).lower()
+        self.run_id = f"{self.model_type}_{self.dataset}_{str(int(time.time()))}".replace("/", "").lower()
         self.output_dir = os.path.join(self.output_dir, self.run_id)
 
     def save_config(self) -> None:
