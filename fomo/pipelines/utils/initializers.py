@@ -81,13 +81,17 @@ def initalize_test_dataloader_subsample(
 
 
 def initalize_datasets(
-    dataset_name: str, transforms: Callable, train_subsample: str = "all", test_subsample: str = "all"
+    dataset_name: str,
+    train_transforms: Callable,
+    eval_transforms: Callable,
+    train_subsample: str = "all",
+    test_subsample: str = "all",
 ) -> tuple[tuple[Dataset, Dataset], tuple[list[str], list[str]]]:
     train_zero_shot_dataset = DatasetInitializer.from_str(dataset_name).value(
-        train=True, transforms=transforms
+        train=True, transforms=train_transforms
     )
     test_zero_shot_dataset = DatasetInitializer.from_str(dataset_name).value(
-        train=False, transforms=transforms
+        train=False, transforms=eval_transforms
     )
 
     train_dataset = train_zero_shot_dataset.dataset
