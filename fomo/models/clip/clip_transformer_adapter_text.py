@@ -49,7 +49,7 @@ class CLIPTransformerAdapterText(ClipBase):
         text_features = text_features.to(torch.float32)  # [n_classes, rep_dim]
 
         num_classes = text_features.shape[0]
-        
+
         text_features = text_features.unsqueeze(1).expand(-1, image_features.shape[0], -1)
         image_features = image_features.unsqueeze(0)
 
@@ -62,24 +62,25 @@ class CLIPTransformerAdapterText(ClipBase):
 
         adapter_image_features = adapter_output[num_classes:]
         adapter_text_features = adapter_output[:num_classes]
-                
+
         adapter_image_features = adapter_image_features / adapter_image_features.norm(dim=-1, keepdim=True)
-        #adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
-        
-        
+        adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
+
         image_ratio = 0.2
         text_ratio = 0.2
-        
+
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        #text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+
         image_features = image_ratio * adapter_image_features + (1 - image_ratio) * image_features
-        #text_features = text_ratio * adapter_text_features  + (1 - text_ratio) * text_features
-        
+        text_features = text_ratio * adapter_text_features + (1 - text_ratio) * text_features
+
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
         logit_scale = self.logit_scale.exp()
-        logits_per_image: torch.Tensor = logit_scale * torch.bmm(image_features.permute(1, 0, 2), text_features.permute(1, 2, 0)).squeeze(1)
+        logits_per_image: torch.Tensor = logit_scale * torch.bmm(
+            image_features.permute(1, 0, 2), text_features.permute(1, 2, 0)
+        ).squeeze(1)
 
         return logits_per_image
