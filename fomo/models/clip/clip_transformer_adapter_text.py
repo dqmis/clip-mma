@@ -64,17 +64,17 @@ class CLIPTransformerAdapterText(ClipBase):
         adapter_text_features = adapter_output[:num_classes]
                 
         adapter_image_features = adapter_image_features / adapter_image_features.norm(dim=-1, keepdim=True)
-        adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
+        #adapter_text_features = adapter_text_features / adapter_text_features.norm(dim=-1, keepdim=True)
         
         
         image_ratio = 0.2
         text_ratio = 0.2
         
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        #text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
         image_features = image_ratio * adapter_image_features + (1 - image_ratio) * image_features
-        text_features = text_ratio * adapter_text_features  + (1 - text_ratio) * text_features
+        #text_features = text_ratio * adapter_text_features  + (1 - text_ratio) * text_features
         
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)

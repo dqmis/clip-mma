@@ -3,7 +3,7 @@ from torch import nn
 
 
 class MaskedMultiheadAttentionDownsampled(nn.Module):
-    def __init__(self, embed_dim=512, downsamling_dim=256, num_heads: int = 4) -> None:
+    def __init__(self, embed_dim=512, downsamling_dim=128, num_heads: int = 4) -> None:
         super(MaskedMultiheadAttentionDownsampled, self).__init__()
 
         self._num_heads = num_heads
@@ -28,14 +28,15 @@ class MaskedMultiheadAttentionDownsampled(nn.Module):
     def _init_attn_mask(num_prompts: int, num_images: int) -> torch.Tensor:
         num_total = num_prompts + num_images
         mask = torch.zeros((num_total, num_total))
+        mask = mask - float("inf")
 
         for i in range(num_prompts):
             for j in range(num_prompts, num_total):
-                mask[i, j] = 1
+                mask[i, j] = 0
 
         for i in range(num_prompts, num_total):
             for j in range(num_prompts):
-                mask[i, j] = 1
+                mask[i, j] = 0
 
         return mask
 
