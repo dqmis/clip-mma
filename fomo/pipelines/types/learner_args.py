@@ -31,6 +31,7 @@ class LearnerArgs:
     train_subsample: str = "all"
     test_subsample: str = "all"
     gaussian_noise_std: float = 0.0
+    evaluate_only: bool = False
 
     def __post_init__(self) -> None:
         self.run_id = f"{self.model_type}_{self.dataset}_{str(int(time.time()))}".replace("/", "").lower()

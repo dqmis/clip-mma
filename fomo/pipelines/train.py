@@ -92,6 +92,11 @@ class Learner:
             train_dataset, test_dataset, self._lr_args
         )
 
+        self.criterion = nn.CrossEntropyLoss()
+
+        if self._lr_args.evaluate_only:
+            return
+
         self._configure_trainable_params()
 
         # Define criterion and optimizer
@@ -101,7 +106,6 @@ class Learner:
             weight_decay=self._lr_args.weight_decay,
         )
 
-        self.criterion = nn.CrossEntropyLoss()
         self.scaler = GradScaler()
 
         # Define scheduler
@@ -144,6 +148,14 @@ class Learner:
                 config=self._lr_args.to_dict(),
                 reinit=True,
             )
+
+        if self._lr_args.evaluate_only:
+            # evaluate on test set
+            self.evaluate("test_all")
+            self.evaluate("test_base")
+            self.evaluate("test_new")
+
+            return
 
         epochs_since_improvement = 0
 
