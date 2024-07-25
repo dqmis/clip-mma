@@ -1,4 +1,4 @@
-# FoMo Project
+# CLIP Multi-Modal Adapter
 
 ## Setup
 
