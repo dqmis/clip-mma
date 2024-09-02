@@ -1,5 +1,6 @@
 # CLIP Multi-Modal Adapter
-
+Code for a paper "Multi-Modal Adapter for Vision-Language Models"
+---
 ## Setup
 
 1. Setup required python version using your preferred method (e.g. pyenv, virtualenv, etc.). For pyenv users:
