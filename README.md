@@ -1,5 +1,5 @@
 # CLIP Multi-Modal Adapter
-Code for a paper "Multi-Modal Adapter for Vision-Language Models"
+Code for a paper ["Multi-Modal Adapter for Vision-Language Models"](https://arxiv.org/abs/2409.02958)
 ---
 ## Setup
 
